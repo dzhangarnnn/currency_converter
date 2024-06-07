@@ -32,7 +32,9 @@ const ConvertationForm: FC<IConvertationFormProps> = ({
           to: baseCurrency === "USD" ? "RUB" : "USD"
         }}
         onSubmit={(values) => {
-          handleSubmit(values.amount, values.from, values.to);
+          if (values.from !== values.to) {
+            handleSubmit(values.amount, values.from, values.to);
+          }
         }}
       >
         {({ handleChange, errors, touched }) => (

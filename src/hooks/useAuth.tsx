@@ -13,17 +13,14 @@ import {
 } from "../services/localStorageService";
 import { ILogin, IRegister } from "../models/ILogin";
 import { IUser } from "../models/IUser";
+import { useCurrency } from "./useCurrency";
 
 type ContextType = {
-  user: {
-    id: string;
-    name: string;
-    surname: string;
-    email: string;
-  };
+  user: IUser;
   isAuth: boolean;
   signUp: (values: IRegister) => string;
   logIn: (values: ILogin) => string;
+  updateUser: (values: IUser) => void;
   logOut: () => void;
 };
 
@@ -32,21 +29,29 @@ const AuthContext = createContext({} as ContextType);
 export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState({} as IUser);
   const [isAuth, setIsAuth] = useState(Boolean(getIsAuthLocalStorage()));
+  const { baseCurrency, setBaseCurrency } = useCurrency();
 
   useEffect(() => {
     if (isAuth) {
       const data = localStorage.getItem("currentUser");
       if (data) {
-        const dataObj = JSON.parse(data);
+        const dataObj: IUser = JSON.parse(data);
         setUser({
           id: dataObj.id,
+          baseCurrency: dataObj.baseCurrency,
           name: dataObj.name,
           surname: dataObj.surname,
           email: dataObj.email
         });
+        setBaseCurrency(dataObj.baseCurrency);
       }
     }
   }, []);
+  useEffect(() => {
+    if (user.baseCurrency) {
+      setBaseCurrency(user.baseCurrency);
+    }
+  }, [isAuth]);
 
   function signUp(values: IRegister) {
     let error = "";
@@ -57,6 +62,7 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
       const id = Date.now().toString();
       setUser({
         id,
+        baseCurrency,
         name: values.name,
         surname: values.surname,
         email: values.email
@@ -65,6 +71,7 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
         values.email.toLowerCase(),
         JSON.stringify({
           id,
+          baseCurrency,
           ...values
         })
       );
@@ -72,6 +79,7 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
         "currentUser",
         JSON.stringify({
           id,
+          baseCurrency,
           ...values
         })
       );
@@ -88,6 +96,7 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
         setIsAuth(true);
         setUser({
           id: dataObj.id,
+          baseCurrency: dataObj.baseCurrency,
           name: dataObj.name,
           surname: dataObj.surname,
           email: dataObj.email
@@ -104,6 +113,23 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
     return error;
   }
 
+  function updateUser(values: IUser) {
+    const data = localStorage.getItem(values.email.toLowerCase());
+    if (data) {
+      setUser(values);
+      setBaseCurrency(values.baseCurrency);
+      const dataObj: IUser = JSON.parse(data);
+      localStorage.setItem(
+        values.email.toLowerCase(),
+        JSON.stringify({ ...values, password: dataObj.password })
+      );
+      localStorage.setItem(
+        "currentUser",
+        JSON.stringify({ ...values, password: dataObj.password })
+      );
+    }
+  }
+
   function logOut() {
     setIsAuth(false);
     setUser({} as IUser);
@@ -111,7 +137,9 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem("currentUser");
   }
   return (
-    <AuthContext.Provider value={{ user, isAuth, signUp, logIn, logOut }}>
+    <AuthContext.Provider
+      value={{ user, isAuth, signUp, logIn, updateUser, logOut }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -120,6 +148,7 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
 export default AuthContextProvider;
 
 export const useAuth = () => {
-  const { user, isAuth, signUp, logIn, logOut } = useContext(AuthContext);
-  return { user, isAuth, signUp, logIn, logOut };
+  const { user, isAuth, signUp, logIn, updateUser, logOut } =
+    useContext(AuthContext);
+  return { user, isAuth, signUp, logIn, updateUser, logOut };
 };

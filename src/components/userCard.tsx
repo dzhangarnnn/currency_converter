@@ -9,6 +9,9 @@ const UserCard = () => {
         <h5 className="card-title pb-2">{user.surname}</h5>
         <h5 className="card-title pb-3">{user.name}</h5>
         <h6 className="card-subtitle  text-muted pb-3">{user.email}</h6>
+        <h6 className="card-subtitle  text-muted pb-3">
+          Базовая валюта: {user.baseCurrency}
+        </h6>
       </div>
     </div>
   );
