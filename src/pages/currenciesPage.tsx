@@ -22,14 +22,15 @@ const CurrenciesPage = () => {
     order: "asc"
   });
 
-  const { data, isSuccess, refetch, isError, isLoading } = useQuery({
+  const { data, isSuccess, isError, isLoading } = useQuery({
     queryFn: () => httpService.getLatest(currencyValue),
-    queryKey: ["currenciesList", "all"]
+    queryKey: ["currenciesList", currencyValue],
+    staleTime: 1000 * 10
   });
 
-  useEffect(() => {
-    refetch();
-  }, [currencyValue]);
+  // useEffect(() => {
+  //   refetch();
+  // }, [currencyValue]);
 
   useEffect(() => {
     setCurrencyValue(baseCurrency);

@@ -1,18 +1,21 @@
 import { Field, Form, Formik } from "formik";
 import React from "react";
-import { useCurrency } from "../hooks/useCurrency";
 import { currenciesCodeList } from "../consts/currenciesCodeList";
+import { useAuth } from "../hooks/useAuth";
 
 const BaseCurrencyForm = () => {
-  const { baseCurrency, setBaseCurrency } = useCurrency();
+  const { user, updateUser } = useAuth();
 
   return (
     <Formik
       initialValues={{
-        baseCurrValue: baseCurrency
+        baseCurrValue: user.baseCurrency
       }}
       onSubmit={(values, { setSubmitting }) => {
-        setBaseCurrency(values.baseCurrValue);
+        updateUser({
+          ...user,
+          baseCurrency: values.baseCurrValue
+        });
         setSubmitting(false);
       }}
     >

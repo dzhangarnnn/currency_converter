@@ -16,9 +16,9 @@ const ConvertionPage = () => {
   const handleSubmit = async (amount: number, from: string, to: string) => {
     try {
       const data = await queryClient.fetchQuery({
-        queryKey: ["2 currencies"],
-        queryFn: () => httpService.getLatest(from, to),
-        staleTime: 10000
+        queryKey: ["currenciesList", from],
+        queryFn: () => httpService.getLatest(from),
+        staleTime: 1000 * 10
       });
       const convObj = {
         amount,

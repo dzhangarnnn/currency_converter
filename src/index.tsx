@@ -7,6 +7,7 @@ import "bootstrap/dist/css/bootstrap.css";
 import BaseCurrencyContextProvider from "./hooks/useCurrency";
 import { BrowserRouter } from "react-router-dom";
 import AuthContextProvider from "./hooks/useAuth";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 const client = new QueryClient();
 
@@ -23,6 +24,7 @@ root.render(
         </BrowserRouter>
       </AuthContextProvider>
     </BaseCurrencyContextProvider>
+    <ReactQueryDevtools initialIsOpen={false} />
   </QueryClientProvider>
   // </React.StrictMode>
 );

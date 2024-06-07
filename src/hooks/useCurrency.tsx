@@ -14,6 +14,7 @@ export const BaseCurrencyContextProvider = ({
   children: ReactNode;
 }) => {
   const [baseCurrency, setBaseCurrency] = useState("RUB");
+  console.log(baseCurrency);
 
   return (
     <BaseCurrencyContext.Provider value={{ baseCurrency, setBaseCurrency }}>
